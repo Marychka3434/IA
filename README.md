@@ -39,7 +39,7 @@ python book_tracker.py
 ## Пример запуска программы
 
 ```python
-if name == "main":
+if _name_ == "_main_":
     root = tk.Tk()
     app = BookTracker(root)
     root.mainloop()
