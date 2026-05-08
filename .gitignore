@@ -1,0 +1,16 @@
+# Файлы с данными (чтобы не загружать твою личную коллекцию книг на GitHub)
+books.json
+
+# Временные файлы Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Файлы IDE (если пользуешься PyCharm, VS Code и т.д.)
+.vscode/
+.idea/
+*.swp
+
+# Системные файлы
+.DS_Store
+Thumbs.db
