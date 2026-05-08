@@ -7,7 +7,7 @@ DATA_FILE = "books.json"
 
 
 class BookTracker:
-    def init(self, root):
+    def _init_(self, root):
         self.root = root
         self.root.title("Book Tracker - Личная кинотека")
         self.root.geometry("800x500")
