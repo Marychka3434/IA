@@ -9,7 +9,7 @@ DATA_FILE = "books.json"
 class BookTracker:
     def init(self, root):
         self.root = root
-        self.root.title("Book Tracker - Трекер прочитанных книг")
+        self.root.title("Book Tracker - Личная кинотека")
         self.root.geometry("800x500")
 
         self.books = []
@@ -81,3 +81,118 @@ class BookTracker:
         ttk.Button(btn_frame, text="Удалить выбранную", command=self.delete_book).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="Сохранить в JSON", command=self.save_data).pack(side="left", padx=5)
         ttk.Button(btn_frame, text="Загрузить из JSON", command=self.load_data).pack(side="left", padx=5)
+
+    def add_book(self):
+        title = self.title_entry.get().strip()
+        author = self.author_entry.get().strip()
+        genre = self.genre_entry.get().strip()
+        pages = self.pages_entry.get().strip()
+
+
+# Валидация: проверка пустых полей
+        if not title or not author or not genre or not pages:
+            messagebox.showerror("Ошибка", "Все поля должны быть заполнены!")
+            return
+
+        # Валидация: проверка, что количество страниц - число
+        if not pages.isdigit():
+            messagebox.showerror("Ошибка", "Количество страниц должно быть целым положительным числом!")
+            return
+
+        pages = int(pages)
+
+        if pages <= 0:
+            messagebox.showerror("Ошибка", "Количество страниц должно быть больше 0!")
+            return
+
+        self.books.append({
+            "title": title,
+            "author": author,
+            "genre": genre,
+            "pages": pages
+        })
+
+        # Очистка полей
+        self.title_entry.delete(0, tk.END)
+        self.author_entry.delete(0, tk.END)
+        self.genre_entry.delete(0, tk.END)
+        self.pages_entry.delete(0, tk.END)
+
+        self.display_books(self.books)
+        self.save_data()
+        messagebox.showinfo("Успех", "Книга добавлена!")
+
+    def delete_book(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showerror("Ошибка", "Выберите книгу для удаления!")
+            return
+
+        for item in selected:
+            values = self.tree.item(item, "values")
+            for book in self.books:
+                if (book["title"] == values[0] and book["author"] == values[1] and
+                    book["genre"] == values[2] and str(book["pages"]) == values[3]):
+                    self.books.remove(book)
+                    break
+
+        self.display_books(self.books)
+        self.save_data()
+        messagebox.showinfo("Успех", "Книга удалена!")
+
+    def apply_filter(self):
+        filter_genre = self.filter_genre_entry.get().strip().lower()
+        filter_pages = self.filter_pages_entry.get().strip()
+
+        filtered = self.books
+
+        if filter_genre:
+            filtered = [b for b in filtered if filter_genre in b["genre"].lower()]
+
+        if filter_pages:
+            if filter_pages.isdigit():
+                filtered = [b for b in filtered if b["pages"] > int(filter_pages)]
+            else:
+                messagebox.showerror("Ошибка", "Фильтр по страницам должен быть числом!")
+
+        self.display_books(filtered)
+
+    def reset_filter(self):
+        self.filter_genre_entry.delete(0, tk.END)
+        self.filter_pages_entry.delete(0, tk.END)
+        self.display_books(self.books)
+
+    def display_books(self, books_list):
+        # Очищаем таблицу
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+        # Заполняем таблицу
+        for book in books_list:
+            self.tree.insert("", tk.END, values=(book["title"], book["author"], book["genre"], book["pages"]))
+
+    def save_data(self):
+        try:
+            with open(DATA_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.books, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Не удалось сохранить данные: {e}")
+
+    def load_data(self):
+        if os.path.exists(DATA_FILE):
+            try:
+                with open(DATA_FILE, "r", encoding="utf-8") as f:
+                    self.books = json.load(f)
+                self.display_books(self.books)
+            except Exception as e:
+                messagebox.showerror("Ошибка", f"Не удалось загрузить данные: {e}")
+        else:
+            self.books = []
+
+
+# Точка входа в программу
+if name == "main":
+    root = tk.Tk()
+    app = BookTracker(root)
+    root.mainloop()
+
