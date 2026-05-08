@@ -33,5 +33,13 @@ Book Tracker — это простое настольное приложение
 
 ## Запуск программы
 Откройте терминал/командную строку в папке с программой и выполните:
-'''bash
+```bash
 python book_tracker.py
+
+## Пример запуска программы
+
+```python
+if name == "main":
+    root = tk.Tk()
+    app = BookTracker(root)
+    root.mainloop()
